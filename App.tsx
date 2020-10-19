@@ -26,13 +26,11 @@ export default App
   const Home = () => {
     const navigation = useNavigation()
 
-    return <View style={{ flex: 1, alignContent: "center", alignItems: "center" }}>
+    return <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <TouchableWithoutFeedback onPress={() => navigation.navigate("PinnedModal")}>
         <Text>Go to pinned modal</Text>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate("pinnedModal")}>
-        <Text>Go to list modal</Text>
-      </TouchableWithoutFeedback>
+     
     </View>
   }
 
@@ -42,13 +40,21 @@ export default App
    <PinnedModalScreen name="PinnedModalScreen" component={ScreenWithPinnedBottom}/>
  </PinnedModalNavigator>)
 
-  const ScreenWithPinnedBottom = () => (
-    <View style={{flex:1}}>
-      <Text>Pull header upwards</Text>
+  const ScreenWithPinnedBottom = () => {
+    const navigation = useNavigation()
+
+    return <View style={{flex:1, alignItems:"center", top: 10}}>
+      <Text>Pull header upwards on iOS 13 device or higher</Text>
+      <Text>observe wobble and frame getting bigger (text is not longer centered) </Text>
+      <TouchableWithoutFeedback onPress={() => navigation.navigate("PinnedModal")}>
+        <Text>push another modal</Text>
+      </TouchableWithoutFeedback>
+
       <View style={{position: "absolute", height: 500, bottom:0, left:0, right:0, backgroundColor: "blue", alignItems:"center", justifyContent:"center"}}>
         <Text>Wobble</Text>
       </View>
-    </View>)
+    </View>
+  }
   
   const {Navigator: MainNavigator, Screen: MainScreen} = createNativeStackNavigator();
 
