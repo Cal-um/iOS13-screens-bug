@@ -9,8 +9,8 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
  * @format
  */
 
-import React from 'react';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import React, { FC, useState } from 'react';
+import { Modal, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { createNativeStackNavigator } from "react-native-screens/native-stack"
 import {enableScreens} from "react-native-screens"
 
@@ -25,10 +25,17 @@ export default App
 
   const Home = () => {
     const navigation = useNavigation()
+    const [open, setOpen] = useState(false)
 
     return <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Modal presentationStyle="pageSheet" animationType="slide" visible={open} >
+        <PinnedModalStack/>
+      </Modal>
       <TouchableWithoutFeedback onPress={() => navigation.navigate("PinnedModal")}>
         <Text>Go to pinned modal</Text>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={() => setOpen(true)}>
+        <Text>open react native modal</Text>
       </TouchableWithoutFeedback>
      
     </View>
@@ -36,17 +43,25 @@ export default App
 
   const {Navigator: PinnedModalNavigator, Screen: PinnedModalScreen} = createNativeStackNavigator();
 
- const PinnedModalStack = () => (<PinnedModalNavigator>
-   <PinnedModalScreen name="PinnedModalScreen" component={ScreenWithPinnedBottom}/>
- </PinnedModalNavigator>)
+ const PinnedModalStack: FC<any> = ({navigation}) => {
+   return <PinnedModalNavigator>
+   <PinnedModalScreen listeners={{
+     transitionStart: () => console.log("START"),
+     transitionEnd: () => console.log("END"),
+     dismiss:() => console.log("DISMISS")
+   }} name="PinnedModalScreen" component={ScreenWithPinnedBottom} options={{headerLeft: () => {
+     return <TouchableWithoutFeedback onPress={() => navigation.goBack()}><Text>close</Text></TouchableWithoutFeedback>
+    }}}/>
+ </PinnedModalNavigator>
+  }
 
   const ScreenWithPinnedBottom = () => {
-    const navigation = useNavigation()
+    const navigation = useNavigation<any>()
 
     return <View style={{flex:1, alignItems:"center", top: 10}}>
       <Text>Pull header upwards on iOS 13 device or higher</Text>
       <Text>observe wobble and frame getting bigger (text is not longer centered) </Text>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate("PinnedModal")}>
+      <TouchableWithoutFeedback onPress={() => navigation.push("PinnedModal")}>
         <Text>push another modal</Text>
       </TouchableWithoutFeedback>
 
@@ -60,9 +75,9 @@ export default App
 
   function MyStack() {
     return (
-      <MainNavigator initialRouteName={"Home"} screenOptions={{stackPresentation:"modal"}}>
+      <MainNavigator initialRouteName={"Home"}>
         <MainScreen name="Home" component={Home} />
-        <MainScreen name="PinnedModal" component={PinnedModalStack} />
+        <MainScreen name="PinnedModal" component={PinnedModalStack} options={{stackPresentation:"modal"}} />
       </MainNavigator>
     );
   }
